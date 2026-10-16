@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "taskflow-demo",
+  "name": "yasenoviy-c-44-2-3",
   "compatibility_date": "2026-10-16",
   "assets": {
     "directory": "./dist",
