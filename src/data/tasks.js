@@ -1,30 +1,10 @@
 export const tasks = [
-  {
-    id: 1,
-    title: 'Створити структуру проєкту',
-    description: 'Підготувати каталоги та файли TaskFlow',
-    status: 'done',
-    priority: 'high',
-  },
-  {
-    id: 2,
-    title: 'Налаштувати Framework7',
-    description: 'Підключити мобільні компоненти інтерфейсу',
-    status: 'progress',
-    priority: 'medium',
-  },
-  {
-    id: 3,
-    title: 'Реалізувати картку завдання',
-    description: 'Створити компонент TaskCard',
-    status: 'todo',
-    priority: 'medium',
-  },
-  {
-    id: 4,
-    title: 'Перевірити PWA',
-    description: 'Зібрати та встановити застосунок',
-    status: 'todo',
-    priority: 'low',
-  },
+  { id: 1, title: 'Створити проєкт TaskFlow', description: 'Vite, Vue 3 і Framework7', completed: true },
+  { id: 2, title: 'Підготувати структуру проєкту', description: 'Каталоги та сторінки', completed: true },
+  { id: 3, title: 'Налаштувати навігацію', description: 'Маршрути та панель', completed: false },
+  { id: 4, title: 'Підготувати звіт', description: 'Оформлення результатів', completed: false },
+  // Додаткове завдання 4: ще три записи з різним статусом
+  { id: 5, title: 'Підключити Framework7 Icons', description: 'Іконки в навігації та картках', completed: true },
+  { id: 6, title: 'Перевірити адаптивність', description: 'Ширина екрана 320, 375 та 768 px', completed: false },
+  { id: 7, title: 'Опублікувати на Cloudflare', description: 'git push та новий deployment', completed: false },
 ];
