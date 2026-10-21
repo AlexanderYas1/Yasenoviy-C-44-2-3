@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import AppTabbar from '../components/AppTabbar.vue'
 import TaskCard from '../components/TaskCard.vue'
+import TaskCounter from '../components/TaskCounter.vue'
 import { taskState, setTaskStatus, setTaskPriority } from '../store/tasks'
 import '../css/task-components.css'
 
@@ -10,6 +11,12 @@ const completedTasks = computed(() => taskState.tasks.filter(
   (task) => task.status === 'done').length)
 const progressTasks = computed(() => taskState.tasks.filter(
   (task) => task.status === 'progress').length)
+// Додаткове завдання 2: четвертий показник «Заплановано»
+const todoTasks = computed(() => taskState.tasks.filter(
+  (task) => task.status === 'todo').length)
+// Додаткове завдання 4: відсоток виконаних завдань
+const completedPercent = computed(() => totalTasks.value
+  ? Math.round((completedTasks.value / totalTasks.value) * 100) : 0)
 const activeTasks = computed(() => {
   const order = { high: 0, medium: 1, low: 2 }
   return taskState.tasks.filter((task) => task.status !== 'done')
@@ -33,13 +40,25 @@ function handlePriorityChange(payload) { setTaskPriority(payload) }
         <p>Контролюйте виконання завдань та їхні пріоритети.</p>
       </section>
 
-      <section class="tf3-stat-grid">
-        <div class="tf3-stat"><span class="tf3-stat-label">Усього завдань</span>
-          <strong>{{ totalTasks }}</strong></div>
-        <div class="tf3-stat"><span class="tf3-stat-label">У роботі</span>
-          <strong>{{ progressTasks }}</strong></div>
-        <div class="tf3-stat"><span class="tf3-stat-label">Виконано</span>
-          <strong>{{ completedTasks }}</strong></div>
+      <!-- Додаткове завдання 3: показники через компонент TaskCounter -->
+      <section class="tf3-stat-grid tf3-stat-grid--4">
+        <TaskCounter label="Усього завдань" :count="totalTasks" />
+        <TaskCounter label="Заплановано" :count="todoTasks" variant="todo" />
+        <TaskCounter label="У роботі" :count="progressTasks" variant="progress" />
+        <TaskCounter label="Виконано" :count="completedTasks" variant="done" />
+      </section>
+
+      <!-- Додаткове завдання 4: відсоток виконання -->
+      <section class="tf3-progress" aria-label="Прогрес виконання">
+        <div class="tf3-progress-head">
+          <span class="tf3-stat-label">Виконано завдань</span>
+          <strong class="tf3-progress-value">{{ completedPercent }}%</strong>
+        </div>
+        <div class="tf3-progress-bar" role="progressbar" :aria-valuenow="completedPercent"
+          aria-valuemin="0" aria-valuemax="100">
+          <div class="tf3-progress-fill" :style="{ width: `${completedPercent}%` }"></div>
+        </div>
+        <div class="tf3-progress-hint">{{ completedTasks }} з {{ totalTasks }}</div>
       </section>
 
       <section class="tf3-section">

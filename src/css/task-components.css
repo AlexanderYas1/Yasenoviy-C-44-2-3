@@ -52,7 +52,32 @@
 .tf3-counter { padding: 7px 12px; border: 1px solid #324b66; border-radius: 9px; color: #bcd0e9; font-size: 12px; }
 .tf3-empty { padding: 30px; border: 1px dashed #38516d; border-radius: 12px; color: #aebfd4; text-align: center; }
 
+/* ---------- Додаткові завдання ---------- */
+/* 2–3. Чотири лічильники TaskCounter з кольоровою смужкою зліва */
+.tf3-stat-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.tf3-stat--todo { border-left: 3px solid #5b8def; }
+.tf3-stat--progress { border-left: 3px solid #e0a43b; }
+.tf3-stat--done { border-left: 3px solid #3fbf8a; }
+
+/* 4. Відсоток виконання */
+.tf3-progress { margin-top: 14px; padding: 18px 22px; border: 1px solid #263a52; border-radius: 14px; background: #142237; }
+.tf3-progress-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.tf3-progress-value { color: #fff; font-size: 26px; }
+.tf3-progress-bar { height: 10px; overflow: hidden; border-radius: 10px; background: #20344b; }
+.tf3-progress-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, #12668b, #3fbf8a); transition: width 0.3s ease; }
+.tf3-progress-hint { margin-top: 8px; color: #aabbd0; font-size: 12px; }
+
+/* 5. Вибір завдання (task-select) */
+.tf3-title-button { width: auto; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.tf3-title-button:hover { color: #7fe0ff; }
+.tf3-title-button:focus-visible { outline: 2px solid #7fe0ff; outline-offset: 3px; border-radius: 4px; }
+.tf3-task-card.is-selected { border-color: #35b4e5; box-shadow: 0 0 0 2px rgba(53, 180, 229, 0.35); }
+.tf3-selected { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 18px; padding: 16px 20px; border: 1px solid #35b4e5; border-radius: 14px; background: #10304a; }
+.tf3-selected-title { margin: 6px 0 10px; color: #fff; font-size: 16px; font-weight: 700; }
+.tf3-selected-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+
 @media (max-width: 740px) {
+  .tf3-stat-grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tf3-task-grid { grid-template-columns: 1fr; }
   .tf3-hero { padding: 20px; }
   .tf3-hero h1 { font-size: 24px; }

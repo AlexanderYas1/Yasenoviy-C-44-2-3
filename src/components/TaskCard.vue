@@ -3,8 +3,11 @@ import { computed } from 'vue'
 import StatusBadge from './StatusBadge.vue'
 import PriorityBadge from './PriorityBadge.vue'
 
-const props = defineProps({ task: { type: Object, required: true } })
-const emit = defineEmits(['status-change', 'priority-change'])
+const props = defineProps({
+  task: { type: Object, required: true },
+  selected: { type: Boolean, default: false }, // додаткове завдання 5: підсвічування обраної картки
+})
+const emit = defineEmits(['status-change', 'priority-change', 'task-select'])
 
 const statusSequence = ['todo', 'progress', 'done']
 const prioritySequence = ['low', 'medium', 'high']
@@ -38,13 +41,21 @@ function changePriority() {
     priority: prioritySequence[(index + 1) % prioritySequence.length],
   })
 }
+
+// Додаткове завдання 5: подія вибору завдання
+function selectTask() {
+  emit('task-select', { id: props.task.id })
+}
 </script>
 
 <template>
-  <f7-card class="tf3-task-card">
+  <f7-card class="tf3-task-card" :class="{ 'is-selected': selected }">
     <f7-card-content>
       <div class="tf3-card-heading">
-        <h3 class="tf3-card-title">{{ task.title }}</h3>
+        <h3 class="tf3-card-title">
+          <button type="button" class="tf3-title-button" :aria-pressed="selected"
+            @click="selectTask">{{ task.title }}</button>
+        </h3>
         <StatusBadge :status="task.status" />
       </div>
       <p class="tf3-card-description">{{ task.description }}</p>
