@@ -23,6 +23,7 @@ const formVisible = ref(false)
 const editingId = ref(null)
 const formAnchor = ref(null)
 const feedback = ref('')
+const searchQuery = ref('') // додаткове завдання 6: пошук за назвою
 
 const statusOptions = [
   { value: 'all', label: 'Усі' },
@@ -42,10 +43,14 @@ const sortOptions = [
   { value: 'priority-asc', label: 'Спершу низький' },
 ]
 
+const normalizedQuery = computed(() => searchQuery.value.trim().toLocaleLowerCase('uk'))
 const filteredTasks = computed(() => taskState.tasks.filter((task) => (
   (selectedStatus.value === 'all' || task.status === selectedStatus.value) &&
-  (selectedPriority.value === 'all' || task.priority === selectedPriority.value)
+  (selectedPriority.value === 'all' || task.priority === selectedPriority.value) &&
+  (!normalizedQuery.value || task.title.toLocaleLowerCase('uk').includes(normalizedQuery.value))
 )))
+// Додаткове завдання 7: назви для перевірки унікальності у формі
+const existingTitles = computed(() => taskState.tasks.map((task) => task.title))
 
 const priorityRank = { high: 3, medium: 2, low: 1 }
 const visibleTasks = computed(() => {
@@ -108,6 +113,7 @@ function saveTask(data) {
   cancelForm()
   selectedStatus.value = 'all'
   selectedPriority.value = 'all'
+  searchQuery.value = '' // щоб нове/змінене завдання було видно у списку
 }
 </script>
 
@@ -129,10 +135,21 @@ function saveTask(data) {
 
       <section v-if="formVisible" ref="formAnchor" class="tf4-form-section">
         <TaskForm :key="editingId ?? 'new'" :task="editingTask"
+          :existing-titles="existingTitles"
           @save="saveTask" @cancel="cancelForm" />
       </section>
 
       <section class="tf3-filters">
+        <!-- Додаткове завдання 6: пошук за назвою реагує на кожне введення -->
+        <div class="tf3-filter-group">
+          <label class="tf3-filter-title" for="tf4-search">Пошук за назвою</label>
+          <div class="tf4-search">
+            <input id="tf4-search" v-model="searchQuery" type="search"
+              placeholder="Почніть вводити назву завдання…" autocomplete="off" />
+            <button v-if="searchQuery" type="button" class="tf4-search-clear"
+              aria-label="Очистити пошук" @click="searchQuery = ''">×</button>
+          </div>
+        </div>
         <div class="tf3-filter-group">
           <div class="tf3-filter-title">Фільтр за статусом</div>
           <div class="tf3-filter-buttons">
@@ -195,7 +212,8 @@ function saveTask(data) {
             @edit="editTask" />
         </div>
         <div v-else class="tf3-empty">
-          За обраними фільтрами завдань не знайдено.
+          <template v-if="normalizedQuery">За запитом «{{ searchQuery.trim() }}» завдань не знайдено.</template>
+          <template v-else>За обраними фільтрами завдань не знайдено.</template>
         </div>
       </section>
     </div>

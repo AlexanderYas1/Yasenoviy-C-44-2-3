@@ -3,6 +3,17 @@ import initialTasks from '../data/tasks'
 
 const allowedStatuses = ['todo', 'progress', 'done']
 const allowedPriorities = ['low', 'medium', 'high']
+// Додаткове завдання 1: категорія (необов'язкова, '' — не вказано)
+const allowedCategories = ['study', 'work', 'personal']
+
+// Додаткове завдання 7: порівняння назв без урахування регістру
+function sameTitle(a, b) {
+  return a.trim().toLocaleLowerCase('uk') === b.trim().toLocaleLowerCase('uk')
+}
+
+export function titleExists(title, exceptId = null) {
+  return taskState.tasks.some((task) => task.id !== exceptId && sameTitle(task.title, title))
+}
 
 export const taskState = reactive({
   tasks: initialTasks.map((task) => ({ ...task })),
@@ -31,6 +42,8 @@ function normalizeTaskData(data) {
   if (!allowedStatuses.includes(data.status)) return null
   if (!allowedPriorities.includes(data.priority)) return null
   if (!validDate(data.dueDate)) return null
+  const category = data.category ?? ''
+  if (category !== '' && !allowedCategories.includes(category)) return null
 
   return {
     title,
@@ -38,12 +51,15 @@ function normalizeTaskData(data) {
     status: data.status,
     priority: data.priority,
     dueDate: data.dueDate,
+    category,
   }
 }
 
 export function addTask(data) {
   const normalized = normalizeTaskData(data)
   if (!normalized) return null
+  // Додаткове завдання 7: повторна перевірка унікальності назви на рівні сховища
+  if (titleExists(normalized.title)) return null
 
   const nextId = taskState.tasks.reduce(
     (maxId, task) => Math.max(maxId, task.id), 0

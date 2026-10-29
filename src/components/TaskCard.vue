@@ -19,6 +19,11 @@ const statusActionText = computed(() => ({
   done: 'Повернути в план',
 })[props.task.status] || 'Змінити статус')
 
+// Додаткове завдання 1 (2.6): підпис категорії
+const categoryText = computed(() => ({
+  study: 'Навчання', work: 'Робота', personal: 'Особисте',
+})[props.task.category] || '')
+
 const formattedDate = computed(() => {
   if (!props.task.dueDate) return 'Без терміну'
   const date = new Date(`${props.task.dueDate}T12:00:00`)
@@ -65,6 +70,10 @@ function selectTask() {
         <div class="tf3-meta-item">
           <span class="tf3-meta-label">Пріоритет:</span>
           <PriorityBadge :priority="task.priority" />
+        </div>
+        <div v-if="categoryText" class="tf3-meta-item">
+          <span class="tf3-meta-label">Категорія:</span>
+          <span class="tf3-badge tf4-category" :class="`tf4-category--${task.category}`">{{ categoryText }}</span>
         </div>
         <div class="tf3-meta-date">Термін: {{ formattedDate }}</div>
       </div>

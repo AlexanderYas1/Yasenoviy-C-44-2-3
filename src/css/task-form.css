@@ -62,6 +62,34 @@
 .tf4-save:focus-visible, .tf4-cancel:focus-visible {
   outline: 2px solid #83e9ff; outline-offset: 3px;
 }
+/* ---------- Додаткові завдання ---------- */
+/* 5. Візуальне маркування обов'язкових полів */
+.tf4-required { color: #ff8fa0; font-weight: 700; }
+.tf4-required-note { margin: 8px 0 0; color: #9fb3ca; font-size: 12px; }
+/* 3. Лічильник: попередження, коли символів залишилось мало */
+.tf4-left-low { color: #ffcf7a; font-weight: 700; }
+/* 1. Категорії */
+.tf4-category { color: #d6dfec; background: #39465a; }
+.tf4-category--study { color: #c9c2ff; background: #352f66; }
+.tf4-category--work { color: #9fdcff; background: #173f5c; }
+.tf4-category--personal { color: #ffc7e6; background: #5a2a48; }
+/* 6. Пошук */
+.tf4-search { position: relative; }
+.tf4-search input {
+  box-sizing: border-box; width: 100%; min-height: 42px; padding: 10px 40px 10px 12px;
+  border: 1px solid #42617d; border-radius: 9px; background: #0c192b; color: #f4f9ff;
+  color-scheme: dark; font: inherit; font-size: 14px;
+}
+.tf4-search input::placeholder { color: #8fa7bf; }
+/* прибираємо стандартний хрестик браузера — є власна кнопка очищення */
+.tf4-search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.tf4-search input:focus { outline: 2px solid #49bce7; outline-offset: 1px; }
+.tf4-search-clear {
+  position: absolute; top: 50%; right: 6px; width: 30px; height: 30px; transform: translateY(-50%);
+  border: 0; border-radius: 6px; background: transparent; color: #aabbd0; font-size: 20px; cursor: pointer;
+}
+.tf4-search-clear:hover { background: #20344b; color: #fff; }
+
 @media (max-width: 740px) {
   .tf4-form { grid-template-columns: 1fr; }
   .tf4-form-panel { padding: 16px; }
