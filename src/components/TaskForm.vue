@@ -9,7 +9,8 @@ const props = defineProps({
 const emit = defineEmits(['save', 'cancel'])
 
 const TITLE_MAX = 80
-const DESCRIPTION_MAX = 300
+// Робота 2.8: ліміт опису й необов'язковий термін — як у сумісній формі методички
+const DESCRIPTION_MAX = 500
 
 // Стандартні значення режиму створення (використовуються і кнопкою «Очистити форму»)
 const defaults = () => ({
@@ -95,7 +96,7 @@ const errors = computed(() => {
   }
 
   if (description.length > DESCRIPTION_MAX) {
-    result.description = 'Опис не повинен перевищувати 300 символів.'
+    result.description = `Опис не повинен перевищувати ${DESCRIPTION_MAX} символів.`
   }
   if (!['todo', 'progress', 'done'].includes(form.status)) {
     result.status = 'Оберіть коректний статус.'
@@ -103,9 +104,9 @@ const errors = computed(() => {
   if (!['low', 'medium', 'high'].includes(form.priority)) {
     result.priority = 'Оберіть коректний пріоритет.'
   }
-  if (!isValidDate(form.dueDate)) {
+  if (form.dueDate && !isValidDate(form.dueDate)) {
     result.dueDate = 'Укажіть коректну дату завершення.'
-  } else if (form.dueDate < today && !keepsOriginalDate.value) {
+  } else if (form.dueDate && form.dueDate < today && !keepsOriginalDate.value) {
     // Додаткове завдання 2: нова або змінена дата не може бути минулою
     result.dueDate = 'Дата завершення не може бути в минулому.'
   }
@@ -134,6 +135,7 @@ function submitForm() {
   if (Object.keys(errors.value).length > 0) return
 
   emit('save', {
+    id: props.task?.id ?? null,
     title: form.title.trim(),
     description: form.description.trim(),
     status: form.status,
@@ -181,7 +183,7 @@ function submitForm() {
           :aria-invalid="showErrors && !!errors.description"
           :aria-describedby="describedBy('description')"></textarea>
         <small id="tf4-description-hint">
-          Необов'язкове поле. Введено: {{ form.description.length }}/300 ·
+          Необов'язкове поле. Введено: {{ form.description.length }}/{{ DESCRIPTION_MAX }} ·
           <span :class="{ 'tf4-left-low': descriptionLeft <= 30 }">залишилось {{ descriptionLeft }} {{ charsWord(descriptionLeft) }}</span>
         </small>
         <p v-if="showErrors && errors.description" id="tf4-description-error" class="tf4-error" role="alert">
@@ -229,15 +231,14 @@ function submitForm() {
       </div>
 
       <div class="tf4-field">
-        <label for="tf4-date">Дата завершення <span class="tf4-required" aria-hidden="true">*</span></label>
+        <label for="tf4-date">Дата завершення</label>
         <input id="tf4-date" v-model="form.dueDate" type="date"
           :min="isEditing ? undefined : today"
-          required aria-required="true"
           :aria-invalid="showErrors && !!errors.dueDate"
           :aria-describedby="describedBy('dueDate')" />
         <small id="tf4-dueDate-hint">
           <template v-if="originalDateIsPast">Термін уже минув — дату можна залишити без змін або перенести на майбутнє.</template>
-          <template v-else>Не раніше сьогоднішнього дня.</template>
+          <template v-else>Необов'язкове поле (без дати — «Без терміну»). Не раніше сьогоднішнього дня.</template>
         </small>
         <p v-if="showErrors && errors.dueDate" id="tf4-dueDate-error" class="tf4-error" role="alert">
           {{ errors.dueDate }}

@@ -8,7 +8,13 @@ const props = defineProps({
   editable: { type: Boolean, default: false },
   selected: { type: Boolean, default: false }, // заняття 2.5, дод. завдання 5
 })
-const emit = defineEmits(['status-change', 'priority-change', 'edit', 'task-select'])
+const emit = defineEmits([
+  'status-change',
+  'priority-change',
+  'edit',
+  'delete', // робота 2.8
+  'task-select',
+])
 
 const statusSequence = ['todo', 'progress', 'done']
 const prioritySequence = ['low', 'medium', 'high']
@@ -65,7 +71,7 @@ function selectTask() {
         </h3>
         <StatusBadge :status="task.status" />
       </div>
-      <p class="tf3-card-description">{{ task.description }}</p>
+      <p class="tf3-card-description">{{ task.description || 'Без опису' }}</p>
       <div class="tf3-card-meta">
         <div class="tf3-meta-item">
           <span class="tf3-meta-label">Пріоритет:</span>
@@ -77,13 +83,18 @@ function selectTask() {
         </div>
         <div class="tf3-meta-date">Термін: {{ formattedDate }}</div>
       </div>
-      <div class="tf3-card-actions">
+      <div class="tf3-card-actions tf5-card-actions">
         <button type="button" class="tf3-action tf3-action--primary"
           @click="changeStatus">{{ statusActionText }}</button>
         <button type="button" class="tf3-action"
-          @click="changePriority">Змінити пріоритет</button>
-        <button v-if="editable" type="button" class="tf3-action"
-          @click="emit('edit', task.id)">Редагувати</button>
+          @click="changePriority">Пріоритет</button>
+        <!-- редагування й видалення — лише на сторінці «Мої завдання» -->
+        <template v-if="editable">
+          <button type="button" class="tf3-action"
+            @click="emit('edit', task.id)">Редагувати</button>
+          <button type="button" class="tf3-action tf5-danger"
+            @click="emit('delete', task.id)">Видалити</button>
+        </template>
       </div>
     </f7-card-content>
   </f7-card>

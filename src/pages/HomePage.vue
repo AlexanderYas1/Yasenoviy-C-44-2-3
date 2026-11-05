@@ -72,6 +72,10 @@ function handlePriorityChange(payload) { setTaskPriority(payload) }
             @status-change="handleStatusChange"
             @priority-change="handlePriorityChange" />
         </div>
+        <!-- 2.8, дод. завдання 5: окреме пояснення для порожнього списку -->
+        <div v-else-if="!totalTasks" class="tf3-empty">
+          Завдань немає — усі видалено. Додайте нове на вкладці «Мої завдання».
+        </div>
         <div v-else class="tf3-empty">Наразі всі завдання виконані.</div>
       </section>
     </div>

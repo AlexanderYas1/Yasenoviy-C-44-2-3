@@ -1,12 +1,22 @@
 import { reactive } from 'vue'
 import initialTasks from '../data/tasks'
 
+// Єдине реактивне сховище для HomePage і TasksPage.
+// Pinia та IndexedDB будемо використовувати в наступних роботах.
 const allowedStatuses = ['todo', 'progress', 'done']
 const allowedPriorities = ['low', 'medium', 'high']
-// Додаткове завдання 1: категорія (необов'язкова, '' — не вказано)
+// 2.6, дод. завдання 1: категорія (необов'язкова, '' — не вказано)
 const allowedCategories = ['study', 'work', 'personal']
 
-// Додаткове завдання 7: порівняння назв без урахування регістру
+export const taskState = reactive({
+  tasks: initialTasks.map((task) => ({ ...task })),
+})
+
+function findTask(id) {
+  return taskState.tasks.find((task) => task.id === Number(id))
+}
+
+// 2.6, дод. завдання 7: порівняння назв без урахування регістру
 function sameTitle(a, b) {
   return a.trim().toLocaleLowerCase('uk') === b.trim().toLocaleLowerCase('uk')
 }
@@ -15,11 +25,9 @@ export function titleExists(title, exceptId = null) {
   return taskState.tasks.some((task) => task.id !== exceptId && sameTitle(task.title, title))
 }
 
-export const taskState = reactive({
-  tasks: initialTasks.map((task) => ({ ...task })),
-})
-
+// Термін необов'язковий: порожній рядок означає «Без терміну»
 function validDate(value) {
+  if (value === '') return true
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return false
   }
@@ -36,12 +44,13 @@ function normalizeTaskData(data) {
   const description = typeof data.description === 'string'
     ? data.description.trim()
     : ''
+  const dueDate = data.dueDate || ''
 
   if (title.length < 3 || title.length > 80) return null
-  if (description.length > 300) return null
+  if (description.length > 500) return null
   if (!allowedStatuses.includes(data.status)) return null
   if (!allowedPriorities.includes(data.priority)) return null
-  if (!validDate(data.dueDate)) return null
+  if (!validDate(dueDate)) return null
   const category = data.category ?? ''
   if (category !== '' && !allowedCategories.includes(category)) return null
 
@@ -50,7 +59,7 @@ function normalizeTaskData(data) {
     description,
     status: data.status,
     priority: data.priority,
-    dueDate: data.dueDate,
+    dueDate,
     category,
   }
 }
@@ -58,37 +67,45 @@ function normalizeTaskData(data) {
 export function addTask(data) {
   const normalized = normalizeTaskData(data)
   if (!normalized) return null
-  // Додаткове завдання 7: повторна перевірка унікальності назви на рівні сховища
+  // 2.6, дод. завдання 7: повторна перевірка унікальності назви на рівні сховища
   if (titleExists(normalized.title)) return null
 
-  const nextId = taskState.tasks.reduce(
-    (maxId, task) => Math.max(maxId, task.id), 0
-  ) + 1
-
+  const nextId = Math.max(0, ...taskState.tasks.map((task) => task.id)) + 1
   const newTask = { id: nextId, ...normalized }
-  taskState.tasks.push(newTask)
+  taskState.tasks.unshift(newTask)
   return newTask
 }
 
 export function updateTask({ id, ...data }) {
+  const task = findTask(id)
+  if (!task) return null
+
   const normalized = normalizeTaskData(data)
   if (!normalized) return null
-
-  const task = taskState.tasks.find((item) => item.id === id)
-  if (!task) return null
 
   Object.assign(task, normalized)
   return task
 }
 
 export function setTaskStatus({ id, status }) {
-  if (!allowedStatuses.includes(status)) return
-  const task = taskState.tasks.find((item) => item.id === id)
-  if (task) task.status = status
+  if (!allowedStatuses.includes(status)) return false
+  const task = findTask(id)
+  if (!task) return false
+  task.status = status
+  return true
 }
 
 export function setTaskPriority({ id, priority }) {
-  if (!allowedPriorities.includes(priority)) return
-  const task = taskState.tasks.find((item) => item.id === id)
-  if (task) task.priority = priority
+  if (!allowedPriorities.includes(priority)) return false
+  const task = findTask(id)
+  if (!task) return false
+  task.priority = priority
+  return true
+}
+
+export function deleteTask(id) {
+  const index = taskState.tasks.findIndex((task) => task.id === Number(id))
+  if (index === -1) return false
+  taskState.tasks.splice(index, 1)
+  return true
 }
