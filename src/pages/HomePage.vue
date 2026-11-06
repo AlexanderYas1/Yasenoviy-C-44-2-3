@@ -1,30 +1,29 @@
 <script setup>
-import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import AppTabbar from '../components/AppTabbar.vue'
 import TaskCard from '../components/TaskCard.vue'
 import TaskCounter from '../components/TaskCounter.vue'
-import { taskState, setTaskStatus, setTaskPriority } from '../store/tasks'
+import { useTasksStore } from '../store/tasks'
+import { useProjectsStore } from '../store/projects'
 import '../css/task-components.css'
+import '../css/task-list.css'
 
-const totalTasks = computed(() => taskState.tasks.length)
-const completedTasks = computed(() => taskState.tasks.filter(
-  (task) => task.status === 'done').length)
-const progressTasks = computed(() => taskState.tasks.filter(
-  (task) => task.status === 'progress').length)
-// Додаткове завдання 2: четвертий показник «Заплановано»
-const todoTasks = computed(() => taskState.tasks.filter(
-  (task) => task.status === 'todo').length)
-// Додаткове завдання 4: відсоток виконаних завдань
-const completedPercent = computed(() => totalTasks.value
-  ? Math.round((completedTasks.value / totalTasks.value) * 100) : 0)
-const activeTasks = computed(() => {
-  const order = { high: 0, medium: 1, low: 2 }
-  return taskState.tasks.filter((task) => task.status !== 'done')
-    .sort((a, b) => order[a.priority] - order[b.priority]).slice(0, 3)
-})
+const taskStore = useTasksStore()
+const projectStore = useProjectsStore()
+const {
+  totalTasks,
+  completedTasks,
+  progressTasks,
+  todoTasks, // 2.5, дод. завдання 2: четвертий показник
+  completedPercent, // 2.5, дод. завдання 4: відсоток виконаних
+  activeTasks,
+} = storeToRefs(taskStore)
+// 2.9, дод. завдання 2: projectStats обчислюється у сховищі — масив завдань не копіюється
+const { projectCount, projectStats } = storeToRefs(projectStore)
 
-function handleStatusChange(payload) { setTaskStatus(payload) }
-function handlePriorityChange(payload) { setTaskPriority(payload) }
+function projectTitleFor(task) {
+  return projectStore.projectTitle(task.projectId)
+}
 </script>
 
 <template>
@@ -37,10 +36,10 @@ function handlePriorityChange(payload) { setTaskPriority(payload) }
       <section class="tf3-hero">
         <div class="tf3-eyebrow">TASKFLOW / DASHBOARD</div>
         <h1>Панель керування</h1>
-        <p>Контролюйте виконання завдань та їхні пріоритети.</p>
+        <p>Контролюйте виконання завдань і пріоритети. Проєктів: {{ projectCount }}.</p>
       </section>
 
-      <!-- Додаткове завдання 3: показники через компонент TaskCounter -->
+      <!-- 2.5, дод. завдання 3: показники через компонент TaskCounter -->
       <section class="tf3-stat-grid tf3-stat-grid--4">
         <TaskCounter label="Усього завдань" :count="totalTasks" />
         <TaskCounter label="Заплановано" :count="todoTasks" variant="todo" />
@@ -48,7 +47,7 @@ function handlePriorityChange(payload) { setTaskPriority(payload) }
         <TaskCounter label="Виконано" :count="completedTasks" variant="done" />
       </section>
 
-      <!-- Додаткове завдання 4: відсоток виконання -->
+      <!-- 2.5, дод. завдання 4: відсоток виконання -->
       <section class="tf3-progress" aria-label="Прогрес виконання">
         <div class="tf3-progress-head">
           <span class="tf3-stat-label">Виконано завдань</span>
@@ -61,6 +60,30 @@ function handlePriorityChange(payload) { setTaskPriority(payload) }
         <div class="tf3-progress-hint">{{ completedTasks }} з {{ totalTasks }}</div>
       </section>
 
+      <!-- 2.9, дод. завдання 2–3: проєкти, невиконані завдання та відсоток виконання -->
+      <section class="tf3-section tf6-home-projects" aria-label="Проєкти">
+        <div class="tf3-section-heading">
+          <div><div class="tf3-eyebrow">PROJECTS</div>
+            <h2>Проєкти</h2></div>
+        </div>
+        <div class="tf6-home-project-grid">
+          <div v-for="project in projectStats" :key="project.id" class="tf6-home-project">
+            <div class="tf6-home-project-head">
+              <strong>{{ project.title }}</strong>
+              <span class="tf6-home-project-percent">{{ project.completedPercent }}%</span>
+            </div>
+            <div class="tf6-home-project-active">
+              Невиконаних: <strong>{{ project.activeCount }}</strong>
+              <span>&nbsp;· усього {{ project.taskCount }}</span>
+            </div>
+            <div class="tf3-progress-bar" role="progressbar" :aria-valuenow="project.completedPercent"
+              aria-valuemin="0" aria-valuemax="100" :aria-label="`Виконання проєкту «${project.title}»`">
+              <div class="tf3-progress-fill" :style="{ width: `${project.completedPercent}%` }"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="tf3-section">
         <div class="tf3-section-heading">
           <div><div class="tf3-eyebrow">PRIORITY TASKS</div>
@@ -68,9 +91,15 @@ function handlePriorityChange(payload) { setTaskPriority(payload) }
           <f7-button href="/tasks/" outline small>Переглянути всі</f7-button>
         </div>
         <div v-if="activeTasks.length" class="tf3-task-grid">
-          <TaskCard v-for="task in activeTasks" :key="task.id" :task="task"
-            @status-change="handleStatusChange"
-            @priority-change="handlePriorityChange" />
+          <TaskCard
+            v-for="task in activeTasks"
+            :key="task.id"
+            :task="task"
+            :project-title="projectTitleFor(task)"
+            :show-management-actions="false"
+            @status-change="taskStore.setTaskStatus"
+            @priority-change="taskStore.setTaskPriority"
+          />
         </div>
         <!-- 2.8, дод. завдання 5: окреме пояснення для порожнього списку -->
         <div v-else-if="!totalTasks" class="tf3-empty">

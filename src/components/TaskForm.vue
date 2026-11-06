@@ -5,6 +5,8 @@ const props = defineProps({
   task: { type: Object, default: null },
   // Додаткове завдання 7: назви наявних завдань для перевірки унікальності
   existingTitles: { type: Array, default: () => [] },
+  // Робота 2.9: перелік проєктів зі сховища Pinia (передає сторінка)
+  projects: { type: Array, required: true },
 })
 const emit = defineEmits(['save', 'cancel'])
 
@@ -20,6 +22,7 @@ const defaults = () => ({
   priority: 'medium',
   dueDate: '',
   category: '',
+  projectId: 'general',
 })
 
 // Копіюємо поля: форма не змінює вихідний об'єкт до натискання «Зберегти».
@@ -32,6 +35,7 @@ const form = reactive({
     priority: props.task.priority ?? 'medium',
     dueDate: props.task.dueDate ?? '',
     category: props.task.category ?? '',
+    projectId: props.task.projectId ?? 'general',
   } : {}),
 })
 
@@ -113,6 +117,9 @@ const errors = computed(() => {
   if (form.category !== '' && !Object.keys(categoryLabels).includes(form.category)) {
     result.category = 'Оберіть коректну категорію.'
   }
+  if (!props.projects.some((project) => project.id === form.projectId)) {
+    result.projectId = 'Оберіть проєкт зі списку.'
+  }
   return result
 })
 
@@ -142,8 +149,13 @@ function submitForm() {
     priority: form.priority,
     dueDate: form.dueDate,
     category: form.category,
+    projectId: form.projectId,
   })
 }
+
+const projectName = computed(
+  () => props.projects.find((project) => project.id === form.projectId)?.title ?? '',
+)
 </script>
 
 <template>
@@ -215,19 +227,18 @@ function submitForm() {
         <p v-if="showErrors && errors.priority" id="tf4-priority-error" class="tf4-error" role="alert">{{ errors.priority }}</p>
       </div>
 
-      <!-- Додаткове завдання 1: категорія -->
+      <!-- Робота 2.9: вибір проєкту зі сховища Pinia -->
       <div class="tf4-field">
-        <label for="tf4-category">Категорія</label>
-        <select id="tf4-category" v-model="form.category"
-          :aria-invalid="showErrors && !!errors.category"
-          :aria-describedby="describedBy('category')">
-          <option value="">Не вказано</option>
-          <option value="study">Навчання</option>
-          <option value="work">Робота</option>
-          <option value="personal">Особисте</option>
+        <label for="tf4-project">Проєкт <span class="tf4-required" aria-hidden="true">*</span></label>
+        <select id="tf4-project" v-model="form.projectId" required aria-required="true"
+          :aria-invalid="showErrors && !!errors.projectId"
+          :aria-describedby="describedBy('projectId')">
+          <option v-for="project in projects" :key="project.id" :value="project.id">
+            {{ project.title }}
+          </option>
         </select>
-        <small id="tf4-category-hint">Необов'язкове поле.</small>
-        <p v-if="showErrors && errors.category" id="tf4-category-error" class="tf4-error" role="alert">{{ errors.category }}</p>
+        <small id="tf4-projectId-hint">Новий проєкт можна створити в блоці «Мої проєкти».</small>
+        <p v-if="showErrors && errors.projectId" id="tf4-projectId-error" class="tf4-error" role="alert">{{ errors.projectId }}</p>
       </div>
 
       <div class="tf4-field">
@@ -245,12 +256,28 @@ function submitForm() {
         </p>
       </div>
 
+      <!-- Додаткове завдання 1: категорія -->
+      <div class="tf4-field">
+        <label for="tf4-category">Категорія</label>
+        <select id="tf4-category" v-model="form.category"
+          :aria-invalid="showErrors && !!errors.category"
+          :aria-describedby="describedBy('category')">
+          <option value="">Не вказано</option>
+          <option value="study">Навчання</option>
+          <option value="work">Робота</option>
+          <option value="personal">Особисте</option>
+        </select>
+        <small id="tf4-category-hint">Необов'язкове поле.</small>
+        <p v-if="showErrors && errors.category" id="tf4-category-error" class="tf4-error" role="alert">{{ errors.category }}</p>
+      </div>
+
       <div class="tf4-preview tf4-field--wide" aria-live="polite">
         <strong>Попередній перегляд</strong>
         <p>{{ form.title || 'Назва нового завдання' }}</p>
         <span>
           {{ statusLabels[form.status] }} · {{ priorityLabels[form.priority] }}
           <template v-if="form.category"> · {{ categoryLabels[form.category] }}</template>
+          <template v-if="projectName"> · Проєкт: {{ projectName }}</template>
         </span>
       </div>
 

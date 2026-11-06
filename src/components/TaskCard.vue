@@ -5,7 +5,10 @@ import PriorityBadge from './PriorityBadge.vue'
 
 const props = defineProps({
   task: { type: Object, required: true },
-  editable: { type: Boolean, default: false },
+  // Робота 2.9: назву проєкту формує сторінка через projectStore.projectTitle(id)
+  projectTitle: { type: String, default: 'Загальні' },
+  // Редагування й видалення: на «Мої завдання» є, на головній вимкнено
+  showManagementActions: { type: Boolean, default: true },
   selected: { type: Boolean, default: false }, // заняття 2.5, дод. завдання 5
 })
 const emit = defineEmits([
@@ -82,6 +85,7 @@ function selectTask() {
           <span class="tf3-badge tf4-category" :class="`tf4-category--${task.category}`">{{ categoryText }}</span>
         </div>
         <div class="tf3-meta-date">Термін: {{ formattedDate }}</div>
+        <div class="tf3-meta-date tf6-meta-project">Проєкт: {{ projectTitle }}</div>
       </div>
       <div class="tf3-card-actions tf5-card-actions">
         <button type="button" class="tf3-action tf3-action--primary"
@@ -89,7 +93,7 @@ function selectTask() {
         <button type="button" class="tf3-action"
           @click="changePriority">Пріоритет</button>
         <!-- редагування й видалення — лише на сторінці «Мої завдання» -->
-        <template v-if="editable">
+        <template v-if="showManagementActions">
           <button type="button" class="tf3-action"
             @click="emit('edit', task.id)">Редагувати</button>
           <button type="button" class="tf3-action tf5-danger"

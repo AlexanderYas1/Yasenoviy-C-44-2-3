@@ -1,6 +1,6 @@
 # TaskFlow Demo
 
-PWA-застосунок для управління завданнями на Vue 3 + Framework7 + Vite.
+PWA-застосунок для управління завданнями на Vue 3 + Framework7 + Vite. Спільний стан (завдання, проєкти, фільтри) зберігається у сховищах Pinia.
 
 Опублікований застосунок: https://yasenoviy-c-44-2-3.sashkadancer2006.workers.dev
 
@@ -9,6 +9,12 @@ PWA-застосунок для управління завданнями на V
 ```bash
 npm install
 npm run dev
+```
+
+Режим розробки з Vue DevTools (вкладка Pinia — сховища `tasks` і `projects`):
+
+```bash
+npm run dev:devtools
 ```
 
 ## Збірка

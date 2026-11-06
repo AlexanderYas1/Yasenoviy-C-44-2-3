@@ -1,19 +1,27 @@
 <script setup>
+// Компонент не імпортує stores: працює за схемою Props → Emits.
 defineProps({
   search: { type: String, default: '' },
   status: { type: String, default: 'all' },
   priority: { type: String, default: 'all' },
+  // Робота 2.9: фільтр за проєктом
+  project: { type: String, default: 'all' },
   sort: { type: String, default: 'newest' },
-  // Дод. завдання 1: швидкий фільтр «Тільки невиконані»
+  projects: { type: Array, required: true },
+  // 2.8, дод. завдання 1: швидкий фільтр «Тільки невиконані»
   onlyActive: { type: Boolean, default: false },
+  // 2.9, дод. завдання 5: фільтр «Лише без терміну»
+  onlyNoDue: { type: Boolean, default: false },
 })
 
 const emit = defineEmits([
   'update:search',
   'update:status',
   'update:priority',
+  'update:project',
   'update:sort',
   'update:onlyActive',
+  'update:onlyNoDue',
   'reset',
 ])
 </script>
@@ -25,7 +33,7 @@ const emit = defineEmits([
     <div class="tf5-controls-grid">
       <div class="tf5-search">
         <label for="tf5-search-input">Пошук за назвою та описом</label>
-        <!-- Дод. завдання 4: «Очистити пошук» видно лише за непорожнього тексту -->
+        <!-- 2.8, дод. завдання 4: «Очистити пошук» видно лише за непорожнього тексту -->
         <div class="tf5-search-row">
           <input
             id="tf5-search-input"
@@ -63,6 +71,16 @@ const emit = defineEmits([
       </label>
 
       <label>
+        Проєкт
+        <select :value="project" @change="emit('update:project', $event.target.value)">
+          <option value="all">Усі проєкти</option>
+          <option v-for="item in projects" :key="item.id" :value="item.id">
+            {{ item.title }}
+          </option>
+        </select>
+      </label>
+
+      <label>
         Сортування
         <select :value="sort" @change="emit('update:sort', $event.target.value)">
           <option value="newest">Спочатку нові</option>
@@ -70,10 +88,10 @@ const emit = defineEmits([
           <option value="priority">За пріоритетом (високий перший)</option>
           <!-- збережено з роботи 2.5: зворотний порядок пріоритету -->
           <option value="priority-asc">За пріоритетом (низький перший)</option>
-          <!-- Дод. завдання 2 -->
+          <!-- 2.8, дод. завдання 2 -->
           <option value="status">За статусом (у роботі → заплановано → виконано)</option>
           <option value="dueDate">За терміном (найближчий перший)</option>
-          <!-- Дод. завдання 6 -->
+          <!-- 2.8, дод. завдання 6 -->
           <option value="dueDate-desc">За терміном (найпізніший перший)</option>
         </select>
       </label>
@@ -85,7 +103,12 @@ const emit = defineEmits([
         @click="emit('update:onlyActive', !onlyActive)">
         {{ onlyActive ? '✓ ' : '' }}Тільки невиконані
       </button>
-      <button type="button" class="tf5-btn" @click="emit('reset')">
+      <button type="button" class="tf5-btn tf5-toggle tf6-no-due"
+        :class="{ 'is-active': onlyNoDue }" :aria-pressed="onlyNoDue"
+        @click="emit('update:onlyNoDue', !onlyNoDue)">
+        {{ onlyNoDue ? '✓ ' : '' }}Лише без терміну
+      </button>
+      <button type="button" class="tf5-btn tf5-reset" @click="emit('reset')">
         Скинути фільтри
       </button>
     </div>
