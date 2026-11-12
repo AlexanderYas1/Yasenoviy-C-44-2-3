@@ -7,16 +7,27 @@ import 'framework7/css/bundle';
 import 'framework7-icons/css/framework7-icons.css';
 import './css/app.css';
 import App from './App.vue';
+import { initializePersistence } from './services/persistence';
 
 // Framework7 має бути підключено, інакше f7-app/f7-view не працюватимуть.
 Framework7.use(Framework7Vue);
 
 const app = createApp(App);
+const pinia = createPinia();
 
 // Робота 2.9: підключаємо Pinia до спільного екземпляра Vue-застосунку.
-app.use(createPinia());
+app.use(pinia);
 
 // Зберігаємо реєстрацію всіх Framework7-компонентів з попередніх робіт.
 registerComponents(app);
 
-app.mount('#app');
+// Робота 2.10: спочатку відновлюємо дані з IndexedDB, а вже потім показуємо інтерфейс.
+async function bootstrap() {
+  await initializePersistence(pinia);
+  app.mount('#app');
+}
+
+bootstrap().catch((error) => {
+  console.error('TaskFlow: помилка запуску:', error);
+  app.mount('#app');
+});

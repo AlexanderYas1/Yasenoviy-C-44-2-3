@@ -1,0 +1,56 @@
+/* Практична робота № 7 (2.10): індикатор локального збереження. */
+.tf7-persistence {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin: 18px 0;
+  padding: 13px 16px;
+  border: 1px solid #385a7a;
+  border-radius: 12px;
+  background: #142a42;
+  color: #e4f2ff;
+  font-size: 14px;
+}
+.tf7-persistence strong { color: #ffffff; }
+.tf7-persistence span { flex: 1 1 240px; }
+.tf7-persistence--saved { border-color: #327c78; }
+.tf7-persistence--saving { border-color: #b49346; }
+.tf7-persistence--loading { border-color: #557391; }
+.tf7-persistence--error {
+  border-color: #bb5c68;
+  background: #482938;
+}
+
+/* ---------- Додаткові завдання ---------- */
+/* 4, 6: час останнього збереження та повідомлення про зміни з іншої вкладки */
+.tf7-persistence-meta { flex-basis: 100%; color: #a9c1da; font-size: 12px; }
+.tf7-persistence-meta .tf7-remote { flex: none; color: #ffd98a; }
+.tf7-saved-at { color: #d9ecff; font-weight: 600; }
+/* 1, 2, 5: експорт, імпорт і перехід до налаштувань */
+.tf7-data-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: -6px 0 18px; }
+.tf7-file { display: none; }
+.tf7-settings-link { margin-left: auto; color: #8bdff7; font-size: 13px; font-weight: 600; }
+.tf7-transfer-error { margin: 0 0 18px; }
+/* 5: сторінка «Налаштування» */
+.tf7-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.tf7-settings-item {
+  padding: 16px 18px; border: 1px solid #28435f; border-radius: 14px; background: #13243a;
+}
+.tf7-settings-item span { display: block; color: #a9c1da; font-size: 12px; }
+.tf7-settings-item strong { display: block; margin-top: 8px; color: #ffffff; font-size: 26px; }
+.tf7-settings-item small { display: block; margin-top: 6px; color: #8fa7bf; font-size: 12px; }
+.tf7-settings-table { width: 100%; border-collapse: collapse; color: #dbe9f8; font-size: 13px; }
+.tf7-settings-table th, .tf7-settings-table td {
+  padding: 9px 10px; border-bottom: 1px solid #28435f; text-align: left; vertical-align: top;
+}
+.tf7-settings-table th { width: 42%; color: #a9c1da; font-weight: 600; }
+.tf7-settings-ok { color: #a9ecd0; }
+.tf7-settings-warn { color: #ffd98a; }
+
+@media (max-width: 680px) {
+  .tf7-persistence { align-items: flex-start; flex-direction: column; }
+  .tf7-persistence span { flex-basis: auto; }
+  .tf7-settings-link { margin-left: 0; }
+  .tf7-settings-grid { grid-template-columns: 1fr; }
+}

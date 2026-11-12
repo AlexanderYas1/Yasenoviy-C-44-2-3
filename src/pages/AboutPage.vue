@@ -30,6 +30,12 @@
         <f7-icon f7="question_circle" aria-hidden="true" />
         Довідка та правила
       </f7-button>
+
+      <!-- Робота 2.10, дод. завдання 5: сторінка зі станом локальної бази -->
+      <f7-button outline large href="/settings/" class="page-action">
+        <f7-icon f7="gear_alt" aria-hidden="true" />
+        Налаштування сховища
+      </f7-button>
     </div>
 
     <!-- слот fixed: панель поза областю прокрутки, завжди внизу екрана -->
